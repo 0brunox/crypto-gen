@@ -111,18 +111,23 @@ function formatCurrency(value) {
 }
 
 // Atualiza cards do dashboard
+function recalculatePortfolioSummary() {
+  // Saldo = soma dos valores dos tokens
+  const saldo = portfolio.tokens.reduce((sum, t) => sum + (t.value > 0 ? t.value : 0), 0);
+  portfolio.balance = saldo;
+  // Investido: soma dos valores dos tokens (ou personalize se quiser controlar o valor investido separadamente)
+  portfolio.invested = saldo;
+  // Lucro: saldo - investido (aqui, 0)
+  portfolio.profit = saldo - portfolio.invested;
+}
+
 function updateDashboard() {
   document.getElementById('balance').textContent = formatCurrency(portfolio.balance);
-  document.getElementById('balanceChange').textContent = `+${portfolio.balanceChange}% vs ano anterior`;
+  document.getElementById('balanceChange').textContent = `+${portfolio.balanceChange ?? 0}% vs ano anterior`;
   document.getElementById('profit').textContent = formatCurrency(portfolio.profit);
-  document.getElementById('profitChange').textContent = `+${portfolio.profitChange}% vs ano anterior`;
+  document.getElementById('profitChange').textContent = `+${portfolio.profitChange ?? 0}% vs ano anterior`;
   document.getElementById('invested').textContent = formatCurrency(portfolio.invested);
-  document.getElementById('investedChange').textContent = `+${portfolio.investedChange}% vs ano anterior`;
-  document.getElementById('roi').textContent = `${portfolio.roi}%`;
-  document.getElementById('roiChange').textContent = `${portfolio.roiChange > 0 ? '+' : ''}${portfolio.roiChange}% vs ano anterior`;
-  if (portfolio.roiChange < 0) {
-    document.getElementById('roiChange').classList.add('negative');
-  }
+  document.getElementById('investedChange').textContent = `+${portfolio.investedChange ?? 0}% vs ano anterior`;
 }
 
 // Atualiza tabela de tokens
@@ -159,6 +164,7 @@ window.removeToken = function(idx) {
 
 // Gráficos
 let pieChartInstance = null;
+let barChartInstance = null;
 function renderCharts() {
   // Pie Chart
   const pieCtx = document.getElementById('pieChart').getContext('2d');
@@ -195,7 +201,8 @@ function renderCharts() {
   });
   // Bar Chart
   const barCtx = document.getElementById('barChart').getContext('2d');
-  new Chart(barCtx, {
+  if (barChartInstance) barChartInstance.destroy();
+  barChartInstance = new Chart(barCtx, {
     type: 'bar',
     data: {
       labels: portfolio.tokens.map(t => t.name),
@@ -367,6 +374,7 @@ function renderHistoryChart() {
   });
 }
 function updateAll() {
+  recalculatePortfolioSummary();
   updateDashboard();
   updateTokenTable();
   renderCharts();
