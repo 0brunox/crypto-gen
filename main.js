@@ -18,73 +18,15 @@ const firestore = getFirestore(app);
 // Auth
 const auth = getAuth(app);
 
-// Dados simulados (mock) iniciais
+// Inicialização do portfolio vazio
 const portfolio = {
-  balance: 480363,
-  balanceChange: 2421,
-  profit: 955090,
-  profitChange: 2721,
-  invested: 379242,
-  investedChange: 2286,
-  roi: 56.69,
-  roiChange: -0.9,
-  tokens: [
-    {
-      name: 'USDC',
-      icon: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png',
-      price: 1.000,
-      priceChange: -0.01,
-      amount: 14270,
-      share: 72.95,
-      value: 14270,
-      valueChange: 14270,
-      stake: false
-    },
-    {
-      name: 'HYPE',
-      icon: 'https://cryptologos.cc/logos/hype-logo.png',
-      price: 20.27,
-      priceChange: 0.0,
-      amount: 125.9,
-      share: 13.01,
-      value: 2550,
-      valueChange: 2550,
-      stake: true
-    },
-    {
-      name: 'SENA',
-      icon: 'https://cryptologos.cc/logos/senate-sena-logo.png',
-      price: 0.273,
-      priceChange: -4.88,
-      amount: 4100,
-      share: 5.73,
-      value: 1120,
-      valueChange: 1120,
-      stake: false
-    },
-    {
-      name: 'SOL',
-      icon: 'https://cryptologos.cc/logos/solana-sol-logo.png',
-      price: 146.64,
-      priceChange: 0.76,
-      amount: 4.72,
-      share: 3.54,
-      value: 691.68,
-      valueChange: 691.68,
-      stake: true
-    },
-    {
-      name: 'DAI',
-      icon: 'https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png',
-      price: 0.999,
-      priceChange: 0.14,
-      amount: -0.00172,
-      share: -0.01,
-      value: -0.00172,
-      valueChange: -0.00172,
-      stake: false
-    }
-  ]
+  balance: 0,
+  balanceChange: 0,
+  profit: 0,
+  profitChange: 0,
+  invested: 0,
+  investedChange: 0,
+  tokens: []
 };
 
 let selectedCurrency = 'USD';
