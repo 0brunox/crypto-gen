@@ -57,7 +57,28 @@ function recalculatePortfolioSummary() {
   // Saldo = soma dos valores dos tokens
   const saldo = portfolio.tokens.reduce((sum, t) => sum + (t.value > 0 ? t.value : 0), 0);
   portfolio.balance = saldo;
-  // Investido: soma dos valores dos tokens (ou personalize se quiser controlar o valor investido separadamente)
+
+  // Encontrar o valor mais antigo dentro do período selecionado
+  const now = new Date();
+  const oldestSnapshot = portfolioHistory
+    .filter(h => (now - new Date(h.date)) / (1000 * 60 * 60 * 24) <= selectedPeriodDays)
+    .sort((a, b) => new Date(a.date) - new Date(b.date))[0];
+
+  // Se não houver histórico no período, usar o valor atual
+  const initialValue = oldestSnapshot ? oldestSnapshot.value : saldo;
+  
+  // Calcular variações percentuais
+  if (initialValue > 0) {
+    portfolio.balanceChange = ((saldo - initialValue) / initialValue * 100).toFixed(2);
+    portfolio.profitChange = portfolio.balanceChange;
+    portfolio.investedChange = portfolio.balanceChange;
+  } else {
+    portfolio.balanceChange = 0;
+    portfolio.profitChange = 0;
+    portfolio.investedChange = 0;
+  }
+
+  // Investido: soma dos valores dos tokens
   portfolio.invested = saldo;
   // Lucro: saldo - investido (aqui, 0)
   portfolio.profit = saldo - portfolio.invested;
@@ -65,11 +86,11 @@ function recalculatePortfolioSummary() {
 
 function updateDashboard() {
   document.getElementById('balance').textContent = formatCurrency(portfolio.balance);
-  document.getElementById('balanceChange').textContent = `+${portfolio.balanceChange ?? 0}% vs ano anterior`;
+  document.getElementById('balanceChange').textContent = `${portfolio.balanceChange >= 0 ? '+' : ''}${portfolio.balanceChange}% vs ${selectedPeriodDays === 1 ? 'ontem' : `últimos ${selectedPeriodDays} dias`}`;
   document.getElementById('profit').textContent = formatCurrency(portfolio.profit);
-  document.getElementById('profitChange').textContent = `+${portfolio.profitChange ?? 0}% vs ano anterior`;
+  document.getElementById('profitChange').textContent = `${portfolio.profitChange >= 0 ? '+' : ''}${portfolio.profitChange}% vs ${selectedPeriodDays === 1 ? 'ontem' : `últimos ${selectedPeriodDays} dias`}`;
   document.getElementById('invested').textContent = formatCurrency(portfolio.invested);
-  document.getElementById('investedChange').textContent = `+${portfolio.investedChange ?? 0}% vs ano anterior`;
+  document.getElementById('investedChange').textContent = `${portfolio.investedChange >= 0 ? '+' : ''}${portfolio.investedChange}% vs ${selectedPeriodDays === 1 ? 'ontem' : `últimos ${selectedPeriodDays} dias`}`;
 }
 
 // Atualiza tabela de tokens
