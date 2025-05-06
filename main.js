@@ -91,7 +91,10 @@ function updateTokenTable() {
       <td>${token.amount > 1000 ? token.amount.toLocaleString(undefined, {maximumFractionDigits:2}) : token.amount}</td>
       <td>${token.share > 0 ? token.share.toFixed(2) : '0.00'}% <span class="progress-bar"><span class="progress${token.share < 0 ? ' negative' : ''}" style="width:${Math.abs(token.share)}%"></span></span></td>
       <td style="color:${token.value >= 0 ? '#4ade80' : '#f87171'};">${formatCurrency(token.value)}</td>
-      <td><button onclick="removeToken(${idx})" style="background:#f87171;color:#fff;border:none;border-radius:6px;padding:4px 12px;cursor:pointer;font-weight:600;">Remover</button></td>
+      <td>
+        <button onclick="editToken(${idx})" style="background:#818cf8;color:#fff;border:none;border-radius:6px;padding:4px 12px;cursor:pointer;font-weight:600;margin-right:6px;">Editar</button>
+        <button onclick="removeToken(${idx})" style="background:#f87171;color:#fff;border:none;border-radius:6px;padding:4px 12px;cursor:pointer;font-weight:600;">Remover</button>
+      </td>
     `;
     tbody.appendChild(tr);
   });
@@ -103,6 +106,37 @@ window.removeToken = function(idx) {
   addHistorySnapshot();
   updateAll();
 }
+
+// Editar Token
+window.editToken = function(idx) {
+  const token = portfolio.tokens[idx];
+  document.getElementById('editTokenName').value = token.name;
+  document.getElementById('editTokenAmount').value = token.amount;
+  document.getElementById('modalEditToken').style.display = 'flex';
+  document.getElementById('editTokenForm').setAttribute('data-idx', idx);
+};
+
+document.getElementById('closeEditToken').onclick =
+document.getElementById('cancelEditToken').onclick = function() {
+  document.getElementById('modalEditToken').style.display = 'none';
+  document.getElementById('editTokenForm').reset();
+};
+
+document.getElementById('editTokenForm').onsubmit = function(e) {
+  e.preventDefault();
+  const idx = parseInt(this.getAttribute('data-idx'));
+  const amount = parseFloat(document.getElementById('editTokenAmount').value);
+  if (!isNaN(amount) && idx >= 0 && idx < portfolio.tokens.length) {
+    const token = portfolio.tokens[idx];
+    token.amount = amount;
+    token.value = parseFloat((token.price * amount).toFixed(2));
+    token.valueChange = token.value;
+    addHistorySnapshot();
+    updateAll();
+  }
+  document.getElementById('modalEditToken').style.display = 'none';
+  document.getElementById('editTokenForm').reset();
+};
 
 // Gráficos
 let pieChartInstance = null;
