@@ -467,6 +467,43 @@ emailLoginForm.onsubmit = async function(e) {
     alert('Erro: ' + (err.message || err));
   }
 };
+// Função para alternar a visibilidade dos valores
+function toggleValuesVisibility() {
+  const button = document.getElementById('toggleVisibilityBtn');
+  const isActive = button.classList.toggle('active');
+  
+  // Seleciona todos os valores que devem ser ocultados
+  const valuesToHide = document.querySelectorAll(`
+    .token-table td:nth-child(2), 
+    .token-table td:nth-child(3), 
+    .token-table td:nth-child(4), 
+    .token-table td:nth-child(5),
+    .card .value,
+    .card .change,
+    #historyChart
+  `);
+  
+  valuesToHide.forEach(value => {
+    if (isActive) {
+      value.classList.add('hidden-value');
+    } else {
+      value.classList.remove('hidden-value');
+    }
+  });
+
+  // Ocultar/Mostrar gráfico de barras
+  const barChart = document.getElementById('barChart');
+  if (barChart) {
+    barChart.style.opacity = isActive ? '0' : '1';
+  }
+  
+  // Atualiza o texto do botão
+  button.innerHTML = `<span class="eye-icon">👁️</span> ${isActive ? 'Mostrar' : 'Ocultar'} Valores`;
+}
+
+// Adiciona o evento de click ao botão
+document.getElementById('toggleVisibilityBtn').addEventListener('click', toggleValuesVisibility);
+
 // Inicialização
 loadPortfolio();
 loadCurrency();
