@@ -135,4 +135,76 @@ h1 {
   .dashboard, .charts {
     flex-direction: column;
   }
+  
+  .container {
+    margin: 0;
+    padding: 16px;
+    border-radius: 0;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .filter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .filter label {
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .filter select {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  #saveCloudBtn, #loadCloudBtn, #logoutBtn, #emailLoginBtn {
+    width: 100%;
+    margin: 8px 0 !important;
+  }
+
+  .token-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .token-table th, .token-table td {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+
+  .chart-box {
+    min-width: 100%;
+    padding: 16px;
+  }
+
+  #modalAddToken form, #modalEmailLogin form, #modalEditToken form {
+    width: 90%;
+    max-width: 320px;
+    margin: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    min-width: 100%;
+  }
+
+  .card .value {
+    font-size: 1.5rem;
+  }
+
+  .card h2 {
+    font-size: 1rem;
+  }
+
+  .progress-bar {
+    width: 60px;
+  }
 } 
