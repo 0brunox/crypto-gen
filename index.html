@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciador de Portfólio de Criptomoedas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyBdiPWlc0Vui6N4Xgh-nJxPCm1a9mMnyiI",
+      authDomain: "portifolio-new-c3114.firebaseapp.com",
+      projectId: "portifolio-new-c3114",
+      storageBucket: "portifolio-new-c3114.firebasestorage.app",
+      messagingSenderId: "239306135723",
+      appId: "1:239306135723:web:8678d27ed29fff0260bfee"
+    };
+    const app = initializeApp(firebaseConfig);
+    window.firestore = getFirestore(app);
+    // Auth
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    window.firebaseAuth = auth;
+    window.firebaseProvider = provider;
+    window.firebaseSignIn = () => signInWithPopup(auth, provider);
+    window.firebaseSignOut = () => signOut(auth);
+    window.firebaseOnAuthStateChanged = onAuthStateChanged;
+    window.getFirestoreDoc = (uid) => doc(window.firestore, 'portfolios', uid);
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Gerenciador de Portfólio de Criptomoedas</h1>
+    <div class="filter">
+      <label for="period">Período:</label>
+      <select id="period">
+        <option value="365">Últimos 365 dias</option>
+        <option value="180">Últimos 180 dias</option>
+        <option value="90">Últimos 90 dias</option>
+        <option value="30">Últimos 30 dias</option>
+        <option value="7">Últimos 7 dias</option>
+        <option value="1">Último 1 dia</option>
+      </select>
+      <label for="currency" style="margin-left:24px;">Moeda:</label>
+      <select id="currency">
+        <option value="USD">USD</option>
+        <option value="BRL">BRL</option>
+      </select>
+      <button id="saveCloudBtn" style="margin-left:24px;background:#60a5fa;color:#181f2a;font-weight:600;padding:8px 18px;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">Salvar na Nuvem</button>
+      <button id="loadCloudBtn" style="margin-left:8px;background:#4ade80;color:#181f2a;font-weight:600;padding:8px 18px;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">Carregar da Nuvem</button>
+      <span id="userInfo" style="margin-left:24px;color:#b0b8c9;font-size:1rem;"></span>
+      <button id="logoutBtn" style="margin-left:8px;background:#f87171;color:#fff;font-weight:600;padding:8px 18px;border:none;border-radius:8px;cursor:pointer;font-size:1rem;display:none;">Logout</button>
+      <button id="emailLoginBtn" style="margin-left:8px;background:#818cf8;color:#fff;font-weight:600;padding:8px 18px;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">Login E-mail</button>
+    </div>
+    <div class="dashboard">
+      <div class="card">
+        <h2>Saldo</h2>
+        <div class="value" id="balance">$0</div>
+        <div class="change" id="balanceChange"></div>
+      </div>
+      <div class="card">
+        <h2>Lucro</h2>
+        <div class="value" id="profit">$0</div>
+        <div class="change" id="profitChange"></div>
+      </div>
+      <div class="card">
+        <h2>Investido</h2>
+        <div class="value" id="invested">$0</div>
+        <div class="change" id="investedChange"></div>
+      </div>
+      <div class="card">
+        <h2>ROI</h2>
+        <div class="value" id="roi">0%</div>
+        <div class="change" id="roiChange"></div>
+      </div>
+    </div>
+    <div class="charts">
+      <div class="chart-box">
+        <h2>Distribuição dos Ativos</h2>
+        <canvas id="pieChart" width="250" height="250"></canvas>
+      </div>
+      <div class="chart-box">
+        <h2>Investido por Ativo</h2>
+        <canvas id="barChart" width="250" height="250"></canvas>
+      </div>
+    </div>
+    <h2 style="margin-top:32px;">Token Breakdown</h2>
+    <button id="addTokenBtn" style="margin-bottom:16px;background:#4ade80;color:#181f2a;font-weight:600;padding:8px 18px;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">Adicionar Token</button>
+    <button id="updatePricesBtn" style="margin-bottom:16px;margin-left:10px;background:#60a5fa;color:#181f2a;font-weight:600;padding:8px 18px;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">Atualizar Preços</button>
+    <table class="token-table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Preço (24H)</th>
+          <th>Quantidade</th>
+          <th>Participação</th>
+          <th>Valor</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tokenTableBody">
+        <!-- Conteúdo dinâmico -->
+      </tbody>
+    </table>
+    <div class="chart-box" style="max-width:700px;margin:40px auto 0 auto;">
+      <h2>Evolução do Portfólio</h2>
+      <canvas id="historyChart" width="600" height="250"></canvas>
+    </div>
+  </div>
+  <!-- Modal Adicionar Token -->
+  <div id="modalAddToken" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000a;z-index:1000;align-items:center;justify-content:center;">
+    <form id="addTokenForm" style="position:relative;background:#232b3b;padding:32px 24px;border-radius:12px;min-width:320px;box-shadow:0 4px 24px #0006;display:flex;flex-direction:column;gap:14px;">
+      <button type="button" id="closeAddToken" style="position:absolute;top:10px;right:10px;background:transparent;border:none;font-size:1.5rem;color:#b0b8c9;cursor:pointer;">&times;</button>
+      <h2 style="margin:0 0 10px 0;font-size:1.2rem;">Adicionar Token</h2>
+      <label>Nome: <input name="name" required style="width:100%;padding:6px;border-radius:6px;border:none;background:#1a2233;color:#fff;"></label>
+      <label>Ícone (URL): <input name="icon" style="width:100%;padding:6px;border-radius:6px;border:none;background:#1a2233;color:#fff;"></label>
+      <label>Símbolo (CoinGecko): <input name="symbol" id="tokenSymbolInput" style="width:100%;padding:6px;border-radius:6px;border:none;background:#1a2233;color:#fff;"></label>
+      <label>Preço: <input name="price" id="tokenPriceInput" type="number" step="0.00000001" required style="width:100%;padding:6px;border-radius:6px;border:none;background:#1a2233;color:#fff;"></label>
+      <label>Variação 24h (%): <input name="priceChange" type="number" step="0.01" value="0" style="width:100%;padding:6px;border-radius:6px;border:none;background:#1a2233;color:#fff;"></label>
+      <label>Quantidade: <input name="amount" type="number" step="0.0001" required style="width:100%;padding:6px;border-radius:6px;border:none;background:#1a2233;color:#fff;"></label>
+      <label>Stake: <input name="stake" type="checkbox"></label>
+      <div style="display:flex;gap:12px;margin-top:10px;">
+        <button type="submit" style="background:#4ade80;color:#181f2a;font-weight:600;padding:8px 18px;border:none;border-radius:8px;cursor:pointer;">Adicionar</button>
+        <button type="button" id="cancelAddToken" style="background:#f87171;color:#fff;font-weight:600;padding:8px 18px;border:none;border-radius:8px;cursor:pointer;">Cancelar</button>
+      </div>
+    </form>
+  </div>
+  <!-- Modal Login E-mail -->
+  <div id="modalEmailLogin" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000a;z-index:1000;align-items:center;justify-content:center;">
+    <form id="emailLoginForm" style="position:relative;background:#232b3b;padding:32px 24px;border-radius:12px;min-width:320px;box-shadow:0 4px 24px #0006;display:flex;flex-direction:column;gap:14px;">
+      <button type="button" id="closeEmailLogin" style="position:absolute;top:10px;right:10px;background:transparent;border:none;font-size:1.5rem;color:#b0b8c9;cursor:pointer;">&times;</button>
+      <h2 style="margin:0 0 10px 0;font-size:1.2rem;">Login/Cadastro E-mail</h2>
+      <label>E-mail: <input name="email" type="email" required style="width:100%;padding:6px;border-radius:6px;border:none;background:#1a2233;color:#fff;"></label>
+      <label>Senha: <input name="password" type="password" required style="width:100%;padding:6px;border-radius:6px;border:none;background:#1a2233;color:#fff;"></label>
+      <div style="display:flex;gap:12px;margin-top:10px;">
+        <button type="submit" id="doEmailLogin" style="background:#60a5fa;color:#181f2a;font-weight:600;padding:8px 18px;border:none;border-radius:8px;cursor:pointer;">Entrar</button>
+        <button type="button" id="doEmailSignup" style="background:#4ade80;color:#181f2a;font-weight:600;padding:8px 18px;border:none;border-radius:8px;cursor:pointer;">Cadastrar</button>
+        <button type="button" id="cancelEmailLogin" style="background:#f87171;color:#fff;font-weight:600;padding:8px 18px;border:none;border-radius:8px;cursor:pointer;">Cancelar</button>
+      </div>
+    </form>
+  </div>
+  <script type="module" src="main.js"></script>
+</body>
+</html> 

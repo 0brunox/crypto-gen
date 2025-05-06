@@ -1,0 +1,138 @@
+body {
+  background: #181f2a;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+.container {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 20px;
+  background: #232b3b;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px #0002;
+}
+h1 {
+  font-size: 2rem;
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+.dashboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+.card {
+  background: #1a2233;
+  border-radius: 12px;
+  padding: 24px;
+  flex: 1 1 220px;
+  min-width: 220px;
+  box-shadow: 0 2px 8px #0001;
+}
+.card h2 {
+  font-size: 1.2rem;
+  margin: 0 0 8px 0;
+  font-weight: 400;
+  color: #b0b8c9;
+}
+.card .value {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.card .change {
+  font-size: 1rem;
+  color: #4ade80;
+}
+.card .change.negative {
+  color: #f87171;
+}
+.charts {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+.chart-box {
+  background: #1a2233;
+  border-radius: 12px;
+  padding: 24px;
+  flex: 1 1 320px;
+  min-width: 320px;
+  box-shadow: 0 2px 8px #0001;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.token-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #1a2233;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px #0001;
+}
+.token-table th, .token-table td {
+  padding: 12px 8px;
+  text-align: left;
+}
+.token-table th {
+  background: #232b3b;
+  color: #b0b8c9;
+  font-weight: 600;
+}
+.token-table tr:not(:last-child) {
+  border-bottom: 1px solid #232b3b;
+}
+.progress-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: #232b3b;
+  overflow: hidden;
+  width: 100px;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 8px;
+}
+.progress {
+  height: 100%;
+  background: #4ade80;
+}
+.progress.negative {
+  background: #f87171;
+}
+.stake {
+  background: #10b981;
+  color: #fff;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  margin-left: 6px;
+  font-weight: 600;
+}
+.filter {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.filter label {
+  color: #b0b8c9;
+  font-size: 1rem;
+}
+.filter select {
+  background: #232b3b;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 1rem;
+}
+@media (max-width: 900px) {
+  .dashboard, .charts {
+    flex-direction: column;
+  }
+} 
